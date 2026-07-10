@@ -25,7 +25,7 @@ with col2:
 if jd_file and cv_files and api_key:
     if st.button("Rank Candidates"):
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         
         jd_text = extract_text(jd_file)
         
