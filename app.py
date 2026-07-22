@@ -53,9 +53,9 @@ if jd_file and cv_files and api_key:
                 3. Present this in a clear, formatted Markdown table followed by brief explanations.
                 """
                 
-                # Using gemini-2.5-flash which supports active free tier quotas
+                # Updated to the current stable frontier flash model
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.5-flash',
                     contents=prompt
                 )
                 
