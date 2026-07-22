@@ -1,6 +1,5 @@
 import streamlit as st
 from google import genai
-from google.genai import types
 import PyPDF2
 
 # Page Setup
@@ -54,9 +53,9 @@ if jd_file and cv_files and api_key:
                 3. Present this in a clear, formatted Markdown table followed by brief explanations.
                 """
                 
-                # Robust call using gemini-2.0-flash with the new client structure
+                # Using gemini-2.5-flash which supports active free tier quotas
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-2.5-flash',
                     contents=prompt
                 )
                 
