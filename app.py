@@ -1,5 +1,6 @@
 import streamlit as st
 from google import genai
+from google.genai import types
 import PyPDF2
 
 # Page Setup
@@ -24,40 +25,45 @@ with col2:
 # Processing
 if jd_file and cv_files and api_key:
     if st.button("Rank Candidates"):
-        # Initialize client for AQ keys
-        client = genai.Client(api_key=api_key)
-        
-        jd_text = extract_text(jd_file)
-        
-        with st.spinner("Analyzing profiles..."):
-            cv_data = []
-            for cv in cv_files:
-                cv_text = extract_text(cv)
-                cv_data.append(f"Candidate: {cv.name}\n{cv_text}")
+        try:
+            # Initialize client for AQ keys
+            client = genai.Client(api_key=api_key)
             
-            combined_cvs = "\n\n---\n\n".join(cv_data)
+            jd_text = extract_text(jd_file)
             
-            prompt = f"""
-            Act as an expert recruiter. Compare the Job Description with the provided candidates.
-            
-            Job Description:
-            {jd_text}
-            
-            Candidates:
-            {combined_cvs}
-            
-            Task:
-            1. Rank the candidates from best fit to worst fit.
-            2. For each candidate, provide a score (0-100), top 3 strengths, and top 2 weaknesses/gaps.
-            3. Present this in a clear, formatted Markdown table followed by brief explanations.
-            """
-            
-            # Using the stable general model ID supported by AQ keys
-            response = client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt,
-            )
-            st.markdown(response.text)
+            with st.spinner("Analyzing profiles..."):
+                cv_data = []
+                for cv in cv_files:
+                    cv_text = extract_text(cv)
+                    cv_data.append(f"Candidate File Name: {cv.name}\nContent:\n{cv_text}")
+                
+                combined_cvs = "\n\n---\n\n".join(cv_data)
+                
+                prompt = f"""
+                Act as an expert recruiter. Compare the Job Description with the provided candidates.
+                
+                Job Description:
+                {jd_text}
+                
+                Candidates:
+                {combined_cvs}
+                
+                Task:
+                1. Rank the candidates from best fit to worst fit.
+                2. For each candidate, provide a score (0-100), top 3 strengths, and top 2 weaknesses/gaps.
+                3. Present this in a clear, formatted Markdown table followed by brief explanations.
+                """
+                
+                # Robust call using gemini-2.0-flash with the new client structure
+                response = client.models.generate_content(
+                    model='gemini-2.0-flash',
+                    contents=prompt
+                )
+                
+                st.markdown(response.text)
+                
+        except Exception as e:
+            st.error(f"An error occurred during generation: {e}")
             
 elif not api_key:
     st.warning("Please enter your Gemini API Key in the sidebar to start.")
